@@ -1,0 +1,39 @@
+# Tasks for creating user accounts
+- name: "Create user accounts for: {{users}}"
+  become: yes
+  user: 
+    name: "{{item.key}}"
+    comment: "{{item.value.name}}"
+    shell: "{{item.value.shell}}"
+    groups: "{{item.value.groups}}"
+    append: yes
+    generate_ssh_key: "{{item.value.create_keys}}"
+    state: present
+  loop: "{{ query('dict', users) }}"
+  tags: ["create_user"]
+
+- name: "Configure sshd for password authentication"
+  become: yes
+  replace:
+    dest=/etc/ssh/sshd_config
+    regexp='#PasswordAuthentication yes'
+    replace='PasswordAuthentication yes'
+  tags: ["create_user"]
+
+- name: "Configure the wheel group for passwordless sudo"
+  become: yes
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+  tags: ["create_user"]
+
+- name: "Restart sshd"
+  become: yes
+  become_method: sudo
+  service:
+    name: sshd
+    state: restarted  
+  tags: ["create_user"]
+

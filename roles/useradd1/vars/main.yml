@@ -1,0 +1,8 @@
+---
+# Variables for user creation
+users:
+  ansibletower:
+    name: Kumaresan Palanisamy
+    create_keys: yes
+    shell: /bin/bash
+    groups: ['wheel']
