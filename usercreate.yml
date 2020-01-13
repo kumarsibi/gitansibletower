@@ -1,0 +1,6 @@
+---
+- name: Create User Account
+  hosts: all
+  roles:
+    - name: Create User Account
+      role: useradd
